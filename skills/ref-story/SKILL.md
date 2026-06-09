@@ -1,13 +1,15 @@
 ---
 name: ref-story
-description: Generate a "rationale-order" view of a source file organized by design intent rather than compiler order. Groups code by the @ref annotations pointing to LLP sections, producing a literate-programming-style narrative of why the file exists in the form it does. This is LLP's killer feature — the thing that makes readers actually want to adopt LLP.
+description: Experimental. Generate a "rationale-order" view of a source file organized by design intent rather than compiler order — grouping code by the @ref annotations pointing to LLP sections and interleaving the referenced prose. A stopgap for the annotated-source-generation tooling planned in LLP 0000 section 7; an LLM rendering can misattribute, so treat its output as a draft view rather than ground truth.
 ---
 
 # ref-story
 
+> **Status: experimental.** The canonical form of this capability is the deterministic `annotate` stage of the validation pipeline planned in [LLP 0000 §7](../../llp/0000-linked-literate-programming.explainer.md#7-annotated-source-generation-planned) — a *generated* view, not an LLM improvisation. This skill is a stopgap that lets an agent produce the view today; because it reconstructs the view by reading rather than parsing, it can misattribute or miss constructs. Treat its output as a draft and prefer the generated tooling once it exists. It is not one of the core LLP workflow skills (see [LLP 0008](../../llp/0008-distributed-agent-skills.rfc.md)).
+
 Use this skill to generate a literate-programming view of a source file. Where the normal view of a file is ordered by language syntax (imports at the top, function definitions in whatever order the author chose), the rationale-order view is ordered by **why** — grouped by the LLP sections that explain each construct, with the relevant prose interleaved between the code fragments.
 
-This is the capability LLP 0000 describes as "annotated source generation" and the README calls "the killer feature." It realizes the promise of literate programming (Knuth) without the maintenance burden of interleaving prose and code in the source file itself — because the prose lives in LLP documents and the code lives in source files, and `@ref` annotations are the bridge.
+It realizes the promise of literate programming (Knuth) without the maintenance burden of interleaving prose and code in the source file itself — because the prose lives in LLP documents and the code lives in source files, and `@ref` annotations are the bridge.
 
 Invoke as:
 
@@ -19,7 +21,7 @@ Invoke as:
 ## Ground rules
 
 - Requires `@ref` annotations in the source file. A file without any annotations produces a view that is mostly the "Unreferenced" section at the bottom — which is a useful signal in itself but not interesting to publish.
-- Depends on `ref-check` for validation: broken references are highlighted in the output so the user knows something is out of sync.
+- Depends on reference validation — the `ref-check` pipeline (LLP 0000 §6) or `llp-maintain`'s interactive checks: broken references are highlighted in the output so the user knows something is out of sync.
 - LLP section anchors are resolved to heading text from the target LLP. The skill reads both the source file and the LLPs it references.
 
 ## Workflow
@@ -172,17 +174,17 @@ fn internal_helper() {
 - 12 referenced (25%)
 - 35 unreferenced (75%)
 - 3 LLP sections cover the referenced constructs
-- 0 broken references (ref-check clean)
+- 0 broken references (references resolve cleanly)
 ```
 
 ### 6. Flag broken references
 
-If `ref-check` reports broken references in the file, render them in a warning section at the top of the view:
+If reference validation (`llp-maintain`, or the `ref-check` pipeline) reports broken references in the file, render them in a warning section at the top of the view:
 
 ```markdown
 > ⚠ This file has 2 broken references. The view below is based on the
 > source file as-is; the unresolved references are marked in the
-> output. Run `ref-check` for details.
+> output. Run `llp-maintain` for details.
 ```
 
 And mark the individual constructs with broken refs clearly in-line.
