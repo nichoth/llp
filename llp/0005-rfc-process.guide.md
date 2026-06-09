@@ -125,16 +125,15 @@ When an RFC covers a complex system with multiple independently reviewable sub-t
 
 ```
 llp/
-  NNNN-slug.md              <- symlink to slug/README.md
   slug/                     <- directory named after the slug
-    README.md               <- umbrella RFC (architecture, motivation, overall design)
-    MMMM-sub-topic.md       <- sub-RFCs, each with their own LLP number
+    NNNN-slug.rfc.md        <- umbrella RFC (architecture, motivation, overall design)
+    MMMM-sub-topic.rfc.md   <- sub-RFCs, each with their own LLP number
     ...
 ```
 
-- The **umbrella RFC** lives as `slug/README.md` and covers overall architecture and motivation.
-- The top-level `NNNN-slug.md` is a **symlink** to `slug/README.md`, keeping the number discoverable in flat listings.
+- The **umbrella RFC** lives as `slug/NNNN-slug.rfc.md` and covers overall architecture and motivation.
 - **Sub-RFCs** get their own LLP numbers from the global sequence and can be accepted, reviewed, or tombstoned independently.
+- All RFC files keep the standard `NNNN-slug.type.md` filename shape from LLP 0000; do not use an unnumbered `README.md` as an LLP document.
 - Use a directory when the RFC would exceed ~800 lines and the sub-topics have independent review/implementation timelines. Don't use one when all parts must be accepted together.
 
 ## Applicability to other LLP types
