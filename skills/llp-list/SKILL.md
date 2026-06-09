@@ -5,7 +5,7 @@ description: List the LLP documents in this repository, grouped by status or fil
 
 # llp-list
 
-Use this skill when the user wants to see what LLPs exist in the repo, or filter them by type, status, or system tag.
+Use this skill when the user wants to see what LLPs exist in the repo, or filter them by type, status, or system tag. It's a read-only utility that complements the core LLP workflow skills (orient · create · review · adopt · maintain).
 
 Invoke as:
 
@@ -23,7 +23,7 @@ Filters can combine: `/llp-list draft type=rfc system=auth`.
 - Other repositories may have additional LLP trees; check the project's root LLP, `CLAUDE.md`, or `AGENTS.md` for documented locations.
 - LLP filenames follow `NNNN-slug.type.md`. The number and type come from the filename; title, status, systems, and author come from the metadata header at the top of the file.
 - Standard statuses: `Draft`, `Review`, `Accepted`, `Active`, `Superseded`, `Tombstoned`.
-- Standard types: `rfc`, `spec`, `decision`, `plan`, `explainer`, `principle`, `guide`, `issue`, `research`.
+- Standard types: `rfc`, `spec`, `decision`, `plan`, `explainer`, `principles`, `guide`, `issue`, `research`.
 
 ## Workflow
 
@@ -84,7 +84,7 @@ DRAFT
 
 ACTIVE
   0001  Greenfield setup               [guide]     Core
-  0004  Design principles              [principle] Core
+  0004  Design principles              [principles] Core
 
 TOMBSTONED
   0009  Legacy sync design             [decision]  Sync
@@ -129,5 +129,5 @@ By default, render as plain text. Support format flags:
 ## Scope limits
 
 - Do not create, modify, or delete LLPs. This skill is read-only.
-- Do not interpret LLP content — just metadata. For content analysis, use `/llp-search` or `/llp-review`.
-- Do not follow cross-references (`Related:` fields). For cross-reference traversal, use `/llp-related`.
+- Do not interpret LLP content — just metadata. For a substantive read of a document, use `/llp-review`.
+- Do not follow cross-references (`Related:` fields); this skill only lists. To load the rationale around a task (following `Related:` and `@ref` links), use `/llp-orient`.

@@ -14,8 +14,9 @@ Invoke as `/llp-create <title>` with an optional title, or `/llp-create` and the
 - LLP documents live in `llp/` (flat or grouped into subdirectories — see LLP 0000 for filesystem organization rules).
 - Filenames follow `NNNN-slug.type.md` where `NNNN` is zero-padded four digits, `slug` is a lowercase kebab-case identifier, and `type` is the lowercased document type.
 - Numbers are globally unique across the entire `llp/` tree, including subdirectories and `llp/tombstones/`. Never reuse a number that has ever been assigned.
-- Standard types (LLP 0000 §Types): `rfc`, `spec`, `decision`, `plan`, `explainer`, `principle`, `guide`, `issue`, `research`. Projects may define additional types; check the project's root LLP for any local conventions.
+- Standard types (LLP 0000 §Types): `rfc`, `spec`, `decision`, `plan`, `explainer`, `principles`, `guide`, `issue`, `research`. Projects may define additional types; check the project's root LLP for any local conventions.
 - Standard statuses (LLP 0000 §Statuses): `Draft`, `Review`, `Accepted`, `Active`, `Superseded`, `Tombstoned`. New LLPs start as `Draft`.
+- Prefer updating an existing LLP over creating a new one. Before scaffolding, `Grep` the `Systems:` and `Related:` headers across `llp/` for a document that already covers this topic; if one does, propose extending it instead (LLP 0008's llp-create contract).
 
 ## Workflow
 
@@ -36,7 +37,7 @@ Required to produce a useful scaffold:
   - "We decided..." / "Chose X over Y" → `decision`
   - "How we'll build..." / "Step-by-step" → `plan`
   - "What is..." / "How ... works" → `explainer`
-  - "Always do..." / "Never do..." → `principle`
+  - "Always do..." / "Never do..." → `principles`
   - "How to use..." / "Workflow for..." → `guide`
   - "Bug in..." / "Problem with..." → `issue`
   - "Analysis of..." / "Findings from..." → `research`
@@ -95,7 +96,7 @@ The exact scaffold may be customized per type. For instance:
 
 - **Decision** documents should use the ADR-style `Context / Options considered / Decision / Consequences` structure.
 - **Plan** documents should have a `Phases` or `Milestones` section.
-- **Principle** documents should use `Principle / Rationale / How to apply` for each principle listed.
+- **Principles** documents should use `Principle / Rationale / How to apply` for each principle listed.
 - **Research** documents should have `Findings` and `Confidence`.
 
 Ask the user if they want the type-specific scaffold, or just the generic one.
@@ -107,7 +108,7 @@ After creating the file, offer to draft initial content based on the current con
 ## After creation
 
 - Confirm the file path and the assigned number back to the user.
-- Offer to add cross-references from other LLPs that should now link to this one (`llp-related` is a separate skill for this).
+- Offer to add cross-references from other LLPs that should now link to this one.
 - Remind the user that the LLP is `Draft` and will need review before moving to `Active`. Use the `llp-review` skill for that.
 
 ## Scope limits
