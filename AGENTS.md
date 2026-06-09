@@ -16,6 +16,18 @@ This project uses **Linked Literate Programming (LLP)** as defined in [LLP 0000]
 - When modifying code that already carries a `@ref`, check that the referenced section still applies. Update or remove it if not.
 - Don't annotate mechanically. A reference should tell you something you wouldn't know from reading only the code and filename.
 
+## Agent skills
+
+This repo ships LLP workflow skills under `skills/` (see the README's Skills section). The orient-first rule below is the ambient guidance; the skills are what it routes to.
+
+<!-- BEGIN LLP SKILLS MANAGED BLOCK -->
+Before editing a subsystem with documented design, orient first: read its
+governing LLP, and for non-trivial work invoke `llp-orient` to assemble a
+context pack of the constraints the change must respect.
+
+Skills: orient = context before coding · create = author one LLP · review = LLP 0005 multi-model loop · adopt = set up LLP in any repo (scaffold or retrofit) · maintain = drift / pre-PR / reconcile / retire checks
+<!-- END LLP SKILLS MANAGED BLOCK -->
+
 ## Working on this project
 
 - Read relevant LLP documents before implementing features or fixing bugs in the areas they cover.

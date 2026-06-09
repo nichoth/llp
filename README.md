@@ -82,17 +82,17 @@ export function handleWidgetRequest(req: Request): Response {
 }
 ```
 
-**3. Validate references:**
+**3. Check references and doc/code drift:**
 
 ```bash
-/ref-check src/
+/llp-maintain --intent audit
 ```
 
-See the [Skills](#skills) section below for how to install and use the validation and review tooling.
+See the [Skills](#skills) section below for how to install and use the orientation, authoring, review, and maintenance tooling.
 
 ## Skills
 
-This repo ships a handful of skills for working with LLP documents and references. They are plain markdown directories under [`skills/`](./skills/), each centered on a `SKILL.md` file. The format is broader than any one harness: Claude Code can consume them directly, and other agent tools can adopt the same artifact shape.
+This repo ships a set of skills for working with LLP documents and references — five core workflows plus a couple of utilities. They are plain markdown directories under [`skills/`](./skills/), each centered on a `SKILL.md` file. The format is broader than any one harness: Claude Code can consume them directly, and other agent tools can adopt the same artifact shape.
 
 ### Using with Claude Code
 
@@ -100,22 +100,26 @@ The skills are self-contained — each is a directory under `skills/` with a `SK
 
 ```bash
 # Copy the skill directory into your Claude Code skills location
-cp -r skills/llp-init ~/.claude/skills/
+cp -r skills/llp-orient ~/.claude/skills/
 ```
 
 (Or install all of them at once by copying the full `skills/` directory.) After installation, invoke them with the slash commands shown below.
 
 ### Available skills
 
+The five **core** skills cover the daily loop — orient → create/adopt → review → maintain — plus a couple of utilities.
+
 | Skill | Slash command | What it does |
 |-------|---------------|-------------|
-| [`llp-init`](./skills/llp-init/SKILL.md) | `/llp-init` | Add LLP to a new repository. Scaffolds the initial `llp/` tree, drafts `LLP 0000`, and adds agent instructions so the repo starts with the core LLP conventions in place. |
-| [`llp-init-retrofit`](./skills/llp-init-retrofit/SKILL.md) | `/llp-init-retrofit` | Add LLP to an existing repository. Surveys the current codebase and docs, drafts the root LLP, proposes initial subsystem LLPs, and lays out a phased annotation and adoption plan. |
-| [`llp-create`](./skills/llp-create/SKILL.md) | `/llp-create <title>` | Create a new LLP document. Scans the existing `llp/` tree, picks the next available number, generates the filename and slug, and scaffolds the metadata header. Asks for type and systems tags if not clear from context. |
-| [`llp-review`](./skills/llp-review/SKILL.md) | `/llp-review <llp>` | Review an LLP document using a standard prompt that asks about strengths, concerns, missing considerations, and open questions. Saves the review as a dated artifact under `notes-archive/llp-reviews/` so reviews accumulate over time. |
-| [`llp-list`](./skills/llp-list/SKILL.md) | `/llp-list [status\|type\|system]` | List LLPs grouped by status or filtered by type, system, or author. Useful for "what's still in draft?" or "what LLPs cover the auth system?" |
-| [`ref-check`](./skills/ref-check/SKILL.md) | `/ref-check [path]` | Extract and validate `@ref` annotations in a codebase. Reports broken references (to LLPs or sections that don't exist), warnings (references to tombstoned or superseded LLPs), and hints (gloss text that may be out of date). The foundational tool for everything downstream. |
-| [`ref-story`](./skills/ref-story/SKILL.md) | `/ref-story <file>` | Generate a rationale-order view of a source file. Groups code constructs by the LLP sections that explain them, interleaves the prose from those sections, and produces a literate-programming-style narrative of the file. |
+| [`llp-orient`](./skills/llp-orient/SKILL.md) | `/llp-orient <path-or-task>` | **(core)** Before editing code, load the governing LLP context: read `LLP 0000`, follow the `@ref`s on the code in scope, find the LLPs covering the relevant systems, and emit a compact context pack. Read-only. |
+| [`llp-create`](./skills/llp-create/SKILL.md) | `/llp-create <title>` | **(core)** Create a new LLP document — next available number, filename/slug, and metadata scaffold. Prefers extending an existing LLP when one already covers the topic. |
+| [`llp-review`](./skills/llp-review/SKILL.md) | `/llp-review <llp>` | **(core)** Run the LLP 0005 multi-model review loop (≥2 model families plus the author) and save one provenance-tracked artifact per review under `llp/reviews/`. Never fabricates a review or accepts on the author's behalf. |
+| [`llp-adopt`](./skills/llp-adopt/SKILL.md) | `/llp-adopt` | **(core)** Bring LLP to a repository, greenfield or brownfield. Detects how much already exists and runs `scaffold` mode (fresh repo) or `retrofit` mode (survey an existing codebase, draft the root LLP, propose an adoption plan). |
+| [`llp-maintain`](./skills/llp-maintain/SKILL.md) | `/llp-maintain --intent <mode>` | **(core)** Keep the corpus healthy: detect code/doc drift, validate `@ref` annotations, check provenance, and propose reconciliations and status changes. Modes: `pre-pr`, `audit`, `reconcile`, `retire-proposal`. Proposes; never applies. |
+| [`llp-list`](./skills/llp-list/SKILL.md) | `/llp-list [filters]` | *(utility)* List LLPs grouped by status or filtered by type, system, or author. Useful for "what's still in draft?" or "what covers the auth system?" |
+| [`ref-story`](./skills/ref-story/SKILL.md) | `/ref-story <file>` | *(experimental)* Rationale-order view of a source file, grouped by the LLP sections that explain each construct. A stopgap for the annotated-source tooling planned in LLP 0000 §7. |
+
+Reference *validation* (`ref-check`) is intentionally **not** a skill: the interactive checks run inside `llp-maintain`, and the deterministic, CI-gating version is the `ref-check` pipeline planned in [LLP 0000 §6](./llp/0000-linked-literate-programming.explainer.md#6-validation-tooling-planned) (a real program, not an LLM workflow). See [LLP 0008](./llp/0008-distributed-agent-skills.rfc.md) for the design behind this skill set.
 
 Every skill's `SKILL.md` is readable on its own — it describes the command surface, the workflow, and the edge cases the skill handles.
 
