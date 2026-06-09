@@ -10,7 +10,7 @@
 
 ## Summary
 
-LLP should ship a small set of first-party **agent skills** — plain-markdown `SKILL.md` files — that make recurring LLP workflows repeatable across projects and agent runtimes. This RFC supersedes the legacy `rfc/SKILL.md` (Exact's RFC process — wrong statuses, wrong paths), an earlier draft that proposed ~14 fine-grained skills, a later draft that paired the skills with a dedicated `llp` CLI, and the init-script approach formerly drafted as LLP 0007 (now removed). Bootstrap belongs in `llp-adopt`: LLP ships **no scripts**, only skills.
+LLP should ship a small set of first-party **agent skills** — plain-markdown `SKILL.md` files — that make recurring LLP workflows repeatable across projects and agent runtimes. This RFC supersedes the legacy `rfc/SKILL.md` (Exact's RFC process — wrong statuses, wrong paths), an earlier draft that proposed ~14 fine-grained skills, a later draft that paired the skills with a dedicated `llp` CLI, and the init-script approach formerly drafted as LLP 0007 (now removed). It also consolidates the seven first-cut skills that landed in `skills/` into a five-skill core (see [Addendum](#addendum-2026-06-09-consolidation-landed)). Bootstrap belongs in `llp-adopt`: LLP ships **no scripts**, only skills.
 
 The design rests on one decision — **skills orchestrate; the harness computes:**
 
@@ -35,7 +35,7 @@ Two failure modes shape the architecture:
 
 **Workflows re-derived each run drift.** Without distributed skills, every agent rediscovers the process from the docs and small variations accumulate: inconsistent scaffolding, shallow retrofits that invent rationale, missing review artifacts, docs that fall out of sync with code. A skill pins the recipe.
 
-The repo currently ships one skill, the legacy `rfc/SKILL.md`. It uses statuses LLP doesn't have (`Implemented`, `Shelved`, `Withdrawn`) and paths that don't exist here (`rfcs/`, `notes-archive/ai-reviews/`). It should be replaced, not adapted.
+This RFC consolidates an existing first-cut skill set rather than starting from scratch. The legacy `rfc/SKILL.md` (Exact's RFC process — statuses LLP doesn't have like `Implemented`/`Shelved`/`Withdrawn`, paths that don't exist here like `rfcs/` and `notes-archive/ai-reviews/`) has been removed. A first implementation of **seven** skills then landed — `llp-init`, `llp-init-retrofit`, `llp-create`, `llp-list`, `llp-review`, `ref-check`, `ref-story` — covering authoring and validation but missing the consumption (orient) and upkeep (maintain) halves of the loop, splitting setup into two skills, and miscategorizing the deterministic reference tooling as skills. This RFC reorganizes those seven into the five-skill architecture below; the [Addendum](#addendum-2026-06-09-consolidation-landed) records the mapping and current state.
 
 ## Non-goals
 
@@ -400,8 +400,8 @@ Each phase is "done" only when it passes against fixture repos checked into this
 | Skill artifacts | filenames, headers, markers, hand-off messages | mostly — structural checks |
 | Skill prose | context-pack quality, drafted LLP content | no — mock model adapters + human review |
 
-**Phase 1 — replace the legacy skill, dogfood in this repo.** The shared mechanics recipes + `llp-orient`, `llp-create`, `llp-review`, and `llp-adopt`'s `scaffold` mode; the `llp_spec` pin convention.
-*Done when:* in `fixtures/greenfield`, `llp-adopt --mode scaffold` writes `llp/` + an LLP 0000 skeleton + both managed blocks idempotently; `llp-create` produces a valid `NNNN-slug.type.md` in that corpus whose filename↔`Type` and metadata check out; `llp-review`, given canned reviewer responses (mock model adapters), files correctly-named artifacts **and refuses to record a review it wasn't given** (the only authenticity test; artifact inspection only tests well-formedness); `llp-orient` returns a context pack (schema above) citing the right spec sections, resolving `@ref`s by reading the targets; the standing token cost of the always-loaded skill descriptions + routing block is measured (Open question 6); the legacy `rfc/SKILL.md` is removed.
+**Phase 1 — consolidate the first-cut skills, dogfood in this repo.** The shared mechanics recipes + `llp-orient`, `llp-create`, `llp-review`, and `llp-adopt`'s `scaffold` mode; the `llp_spec` pin convention. (The five core `SKILL.md` files now exist in `skills/`; see the [Addendum](#addendum-2026-06-09-consolidation-landed).)
+*Done when:* in `fixtures/greenfield`, `llp-adopt --mode scaffold` writes `llp/` + an LLP 0000 skeleton + both managed blocks idempotently; `llp-create` produces a valid `NNNN-slug.type.md` in that corpus whose filename↔`Type` and metadata check out; `llp-review`, given canned reviewer responses (mock model adapters), files correctly-named artifacts **and refuses to record a review it wasn't given** (the only authenticity test; artifact inspection only tests well-formedness); `llp-orient` returns a context pack (schema above) citing the right spec sections, resolving `@ref`s by reading the targets; the standing token cost of the always-loaded skill descriptions + routing block is measured (Open question 6); the legacy `rfc/SKILL.md` is gone and the seven first-cut skills are consolidated into the five core skills plus the `llp-list` utility and the experimental `ref-story`.
 
 **Phase 1.5 — installable elsewhere.** The `llp-spec/` vendoring convention (submodule or pinned snapshot) + the skew (equality) check; `llp-adopt`'s install step (copy skills, vendor spec, write the SKILLS block); the adapter-table locations confirmed per runtime.
 *Done when:* installing into a fixture consumer (manual/preinstalled cold start, then project-local vendoring via `llp-adopt`) places skills in the right runtime dir, vendors `llp-spec/`, writes only the SKILLS managed block (leaving an existing SCAFFOLD block intact), and a skill `llp_spec` that mismatches the snapshot is flagged.
@@ -432,3 +432,26 @@ Each phase is "done" only when it passes against fixture repos checked into this
 5. **Router skill / residual trigger overlap.** With the orient-first rule moved to the always-in-context `AGENTS.md` block (not relying on ambient skill-fire), the main residual overlaps are `llp-maintain --intent pre-pr` vs. a final `llp-orient`, and `llp-create` vs. `llp-adopt` on a near-empty repo (mitigated: `llp-create` hands off to `llp-adopt --mode scaffold` when there's no corpus). If these still mis-fire in practice, add a thin `llp` dispatcher — or not.
 6. **Token footprint — a named adoption risk, not a footnote.** Five always-loaded skill descriptions plus the routing block have a standing cost — the very thing the ETH AGENTS.md study cited in LLP 0000 measured (14–22% for verbose context). It also cuts against LLP's own "pointers, not prose" premise, since `llp-orient` plus the ambient rule push "assemble context up front." Phase 1 measures the standing cost; the ambient-orientation rule must earn its tokens, and descriptions get trimmed accordingly.
 7. **Splitting the doc — and extracting two independent specs.** If the worked examples and Skill Contract grow, move the per-skill `SKILL.md` templates (and the shared mechanics recipes) into a companion guide (`0009-agent-skill-contract.guide.md`). More consequentially, two pieces of this RFC are independently reviewable specs that should become their own LLPs *at acceptance*, so the five-skill architecture can be accepted atomically without ratifying them: (a) the `llp-spec:` reference grammar (a normative addition to LLP 0000 §2), and (b) the provenance claim-marker taxonomy (`[observed]`/`[inferred]`/`[confirmed]` + `## Evidence`). Each can be reworked without touching the architecture. Recommended: keep them inline while in `Review` so the design reads in one place; extract both when 0008 moves to `Accepted`.
+
+## Addendum (2026-06-09): Consolidation landed
+
+A first-cut implementation of seven skills had landed in `skills/` in parallel with this RFC. Those seven were reorganized into the architecture above. This addendum records the mapping and the current state; it does not change the design.
+
+**Skill mapping (7 → 5 core + 2 secondary):**
+
+| First-cut skill(s) | Becomes | Notes |
+|---|---|---|
+| `llp-init` + `llp-init-retrofit` | **`llp-adopt`** (core) | Unified; `scaffold`/`retrofit` modes auto-detected. The old `llp-init` already detected "substantial code" and bounced to retrofit — that detection is the mode-select. |
+| `llp-create` | **`llp-create`** (core) | Kept; type naming fixed (`principles`); "prefer updating an existing LLP" added. |
+| `llp-review` | **`llp-review`** (core) | Realigned to LLP 0005: multi-model loop, `llp/reviews/` path (was the stale `notes-archive/`), provenance header, refuse-by-default. |
+| — (new) | **`llp-orient`** (core) | The keystone. The first cut had no consumption-side skill at all. |
+| `ref-check` (interactive part) | **`llp-maintain`** (core) | New skill; absorbs interactive `@ref` validation plus drift/provenance/status checks across four modes. |
+| `llp-list` | `llp-list` (utility) | Kept as a read-only utility, not a core workflow. |
+| `ref-story` | `ref-story` (experimental) | Kept but marked experimental; canonical form is the LLP 0000 §7 generated view, not an LLM skill. |
+| `ref-check` (deterministic part) | — (not a skill) | A `SKILL.md` can't be a CI gate with exit codes; the deterministic checker is the LLP 0000 §6 `ref-check` pipeline. |
+
+**Implemented:** the five core `SKILL.md` files plus `llp-list` and `ref-story`; the `AGENTS.md` SKILLS routing block; README and these docs updated.
+
+**Still pending (this keeps the RFC in `Review`, not `Active`):** the `llp-spec/` vendoring convention and skew check; `@ref`/`llp-spec:` dogfooding *inside* the `SKILL.md` files — the in-repo skills currently use relative markdown links, since `llp-spec:` targets are meant for vendored copies; the deterministic `ref-check` pipeline (LLP 0000 §6); the fixture and negative-fixture harness; and the multi-model review of this RFC itself.
+
+The five-vs-seven decision and this mapping were weighed against the first-cut implementation before consolidating — that comparison is the rationale for the architecture above.
