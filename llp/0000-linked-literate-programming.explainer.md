@@ -132,7 +132,7 @@ Optional fields:
 
 - `**Role:** Root` — marks an overview document that serves as the entry point for a project or subsystem
 - `**Revised:** YYYY-MM-DD` — last substantive revision date
-- `**Related:** LLP 0007, docs/foo.md` — nearby documents worth reading with this one
+- `**Related:** LLP 0003, docs/foo.md` — nearby documents worth reading with this one
 
 #### Types and statuses
 
@@ -141,7 +141,7 @@ LLP documents can take many forms. Rather than splitting them across directories
 ```markdown
 # LLP NNNN: Title
 
-**Type:** RFC | Spec | Decision | Plan | Explainer | Principle | Guide | Issue | Research
+**Type:** RFC | Spec | Decision | Plan | Explainer | Principles | Guide | Issue | Research
 **Status:** Draft | Review | Accepted | Active | Superseded | Tombstoned
 **Systems:** Auth, Protocol, Reconciler, ...
 **Author:** ...
@@ -159,7 +159,7 @@ The following are the **standard types** — a core set that covers the most com
 | **Decision** | A specific choice and its rationale — what was decided and why, like an ADR |
 | **Plan** | Execution or implementation steps — the "how" and "when" |
 | **Explainer** | Teaching material — helps someone understand a subsystem or concept |
-| **Principle** | Core beliefs and values that guide decisions — the "always" and "never" |
+| **Principles** | Core beliefs and values that guide decisions — the "always" and "never" |
 | **Guide** | Usage documentation — how to use, configure, or work with something |
 | **Issue** | A bug, problem, or investigation — what's wrong and what we know |
 | **Research** | Findings from exploration, experiments, or comparative analysis — what was learned and how confident we are |

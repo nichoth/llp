@@ -59,7 +59,7 @@ As you make design decisions during initial development — choosing a database,
 These early documents tend to be RFCs or Principles:
 
 - **RFC** for specific technical choices: "We chose SQLite over Postgres because this is a single-node CLI tool and embedded storage eliminates a deployment dependency."
-- **Principle** for recurring values: "We prefer explicit configuration over convention-based magic because this codebase will be maintained primarily by agents that benefit from direct traceability."
+- **Principles** for recurring values: "We prefer explicit configuration over convention-based magic because this codebase will be maintained primarily by agents that benefit from direct traceability."
 
 Don't write documents preemptively. Write them when you actually make the decision, while the reasoning is fresh.
 
@@ -100,7 +100,7 @@ See [LLP 0000's adoption principles](./0000-linked-literate-programming.explaine
 A typical new project benefits from 3-5 initial LLPs:
 
 1. **LLP 0000** (usually Explainer, sometimes RFC) — Root overview and entry point
-2. **LLP 0001** (Principle or RFC) — Core design philosophy or key technical choice
+2. **LLP 0001** (Principles or RFC) — Core design philosophy or key technical choice
 3. **LLP 0002+** (RFC or Research) — Individual design decisions or findings as they arise
 
 The numbering will grow organically. Don't plan the numbering scheme — just take the next number.

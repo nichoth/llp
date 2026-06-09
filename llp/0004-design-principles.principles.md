@@ -1,6 +1,6 @@
 # LLP 0004: Design Principles
 
-**Type:** Principle
+**Type:** Principles
 **Status:** Draft
 **Systems:** LLP
 **Author:** Charlie Cheever / Claude
