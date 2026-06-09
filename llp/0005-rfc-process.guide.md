@@ -99,7 +99,9 @@ llp/reviews/
   0042-widget-api.gemini.md
 ```
 
-These are reference material, not LLP documents — they don't get numbers or metadata headers. They exist so that future readers can see what concerns were raised and how they were addressed.
+These are reference material, not LLP documents — they don't get numbers or an LLP metadata block. They exist so that future readers can see what concerns were raised and how they were addressed.
+
+They may, however, open with a short **provenance header** recording the reviewer family, provider/runtime, date, whether content was redacted, and the review method (`manual` | `sub-agent` | `cli-runner`). This is lightweight self-attestation — not an LLP metadata header — that makes the review's origin auditable. See [LLP 0008](./0008-distributed-agent-skills.rfc.md#multi-model-review-protocol), which defines the header and what tooling can and cannot verify about it.
 
 ## When to skip formal review
 
