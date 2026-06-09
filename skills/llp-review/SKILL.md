@@ -1,129 +1,108 @@
 ---
 name: llp-review
-description: Review an existing LLP document using a standard review prompt that asks about strengths, concerns, missing considerations, and open questions. Saves the review as a dated artifact for later reference.
+description: Run the multi-model review loop for an LLP document (LLP 0005). Prepares the standard review prompt, orchestrates reviews from at least two model families plus the author, and writes one provenance-tracked artifact per review actually received under llp/reviews/. Enforces the loop for documents in Review; offers it otherwise. Never fabricates a review and never accepts on the author's behalf.
 ---
 
 # llp-review
 
-Use this skill when the user wants a structured review of an LLP document. The review uses a standard prompt designed to elicit substantive feedback rather than surface-level commentary, and the result is saved as a file so reviews accumulate as a durable artifact.
+Use this skill to review an LLP document the way LLP 0005 prescribes: critical feedback from **at least two model families plus the author**, captured as durable artifacts. The point of the loop is cognitive diversity — different model families catch different blind spots — so a single session cannot honestly stand in for the whole loop, and this skill is built so the honest path is the only path.
 
-Invoke as `/llp-review <identifier>` where `<identifier>` is an LLP number, slug, or filename. If omitted, the skill lists Draft and Review LLPs and asks which to review.
+Invoke as `/llp-review <identifier>` where `<identifier>` is an LLP number, slug, or filename. With no argument, list the `Draft` and `Review` LLPs and ask which to review.
+
+See [LLP 0005](../../llp/0005-rfc-process.guide.md) for the process and [LLP 0008 §Multi-model review protocol](../../llp/0008-distributed-agent-skills.rfc.md#multi-model-review-protocol) for the provenance contract.
 
 ## Ground rules
 
-- LLPs live in `llp/` (and any additional directories the project's root LLP or `CLAUDE.md` indicates).
-- LLP filenames follow `NNNN-slug.type.md`.
-- Reviews are saved under `notes-archive/llp-reviews/<slug>.round-N.claude.md` where `<slug>` is derived from the LLP filename by stripping the `NNNN-` prefix and the `.type.md` suffix.
-- Reviews are numbered per-LLP starting at `round-1`. Increment to `round-N+1` if prior rounds exist.
-- A single LLP may have multiple reviews from different models or different rounds — that's expected.
+- LLPs live in `llp/`; filenames follow `NNNN-slug.type.md`.
+- Review artifacts go under **`llp/reviews/`**, one file per reviewing model family: `llp/reviews/NNNN-slug.<family>.md` (e.g. `0042-widget-api.gpt.md`, `…​.claude.md`, `…​.gemini.md`). These are reference material, not LLPs — no number, no LLP metadata block.
+- Each artifact opens with a short **provenance header** (below). That makes its origin auditable.
+- **Never record a review that didn't happen.** Do not claim the author review, a fresh Claude-family review, or a non-Claude review is done unless it was actually provided.
+- **Never change `**Status:**` or accept/reject.** That's the human's call (LLP 0005 §4–5). Propose transitions; don't apply them.
+
+## When the loop is required vs. optional
+
+- **Required** when the document is in `Review`, or when formal review is explicitly requested. Enforce the full loop.
+- **Optional** otherwise — offer it, don't impose it. Small or codifying RFCs, and well-understood decisions, may skip formal review ([LLP 0005 §When to skip](../../llp/0005-rfc-process.guide.md#when-to-skip-formal-review)).
 
 ## The standard review prompt
 
-Apply this review prompt to the LLP being reviewed:
+Apply this prompt (or a close variant) to the document under review:
 
 > What do you think of this proposal? Is it a good idea? Do we have a good plan here? How would you change it to make it better? What would you add or take away or change? Is anything definitely or possibly wrongheaded here? Do you have any novel ideas that you think might make this way better even if they are a bit non-standard? What are the key open questions we need to answer to refine this?
 
-Adapt the phrasing slightly if the LLP type is not a proposal (e.g., Research — "What do you think of this analysis? Are the findings sound?" Decision — "Do you agree with this choice?"). The intent is to get substantive feedback that the author can act on, not to produce a checklist.
+Adapt the phrasing if the type isn't a proposal (Research → "Are the findings sound?"; Decision → "Do you agree with this choice?"). The intent is substantive, actionable feedback — not a checklist.
 
 ## Workflow
 
-### 1. Locate the LLP
+### 1. Locate and read the LLP
 
-Accept any of these identifiers:
+Accept a number (`0042`, `LLP 0042`), a slug, a filename fragment, or a full path. Scan `llp/` recursively, match by number first then slug; disambiguate if needed. Read the full file — do not skim.
 
-- A number: `0042`, `42`, `LLP 0042`
-- A slug: `token-rotation`
-- A filename fragment: `0042-token-rotation`
-- A full path: `llp/0042-token-rotation.rfc.md`
-- Nothing — list all `Draft` and `Review` LLPs and ask the user to pick one
+### 2. Write this session's review (one family only)
 
-Scan `llp/` recursively. Match by number first (exact), then by slug substring (case-insensitive). If multiple match, ask the user to disambiguate.
+If this session is explicitly acting as one independent model-family reviewer — and is **not** the session that authored the draft — produce a review using the structure below, and count it as exactly one family (this session's). If this session authored the draft, it cannot also serve as the independent fresh-Claude review; say so.
 
-### 2. Read the LLP
+### 3. Gather the other required inputs — and stop until they exist
 
-Read the full file. Do not skim.
+The loop needs the author's review plus at least two distinct model families. For each missing input, use whichever path the environment supports:
 
-### 3. Produce the review
+1. Human pastes the document into another model manually.
+2. A sub-agent/task on a *different* model family, where the runtime offers one.
+3. A CLI model runner (e.g. in CI).
 
-Structure the review as:
+**STOP until the missing reviews are actually provided.** Do not mark the loop complete by intent, and do not invent a review for a family that didn't run. Sending code or docs to an external provider is never automatic — it takes an explicit human action; default to redacting secrets/credentials and prefer a local runner for sensitive material.
+
+### 4. Write one artifact per review actually received
+
+For each review you genuinely have, write `llp/reviews/NNNN-slug.<family>.md` (create `llp/reviews/` if absent), opening with the provenance header:
+
+```markdown
+**Reviewer family:** <e.g. Claude | GPT | Gemini>
+**Provider / runtime:** <e.g. claude-code sub-agent | pasted manually | cli-runner>
+**Date:** YYYY-MM-DD
+**Redacted:** <yes/no — was anything withheld before sending?>
+**Method:** <manual | sub-agent | cli-runner>
+```
+
+followed by the review body (structure below).
+
+### 5. Present and propose next steps
+
+Show the review(s) and the saved path(s). Based on the feedback, *propose* a status transition (stay `Draft` and revise / move to `Review` for more families / ready for the author to `Accept`) — but leave the change to the human. Remind them that a single AI review is not sufficient for acceptance under LLP 0005.
+
+## Review body structure
+
+Lead with findings, not process:
 
 ```markdown
 # Review of LLP NNNN: <Title>
 
-**Reviewer:** Claude (<model version if known>)
-**Date:** YYYY-MM-DD
-**Round:** <N>
-**LLP Status at review time:** <Draft | Review | etc.>
-
 ## Overall assessment
-
-One or two paragraphs on the proposal as a whole. Is it a good idea? Is the plan sound? What's the big-picture reaction?
+One or two paragraphs: is it a good idea, is the plan sound, big-picture reaction.
 
 ## Strengths
-
-- Concrete things the LLP gets right — specific sections, specific decisions, specific arguments.
-- Be specific, not generic. "Good summary" is not useful; "the summary correctly identifies the trade-off between X and Y" is.
+- Specific things it gets right (cite sections). "Good summary" is useless; "the summary correctly identifies the X/Y trade-off" is useful.
 
 ## Concerns
-
-- Substantive issues. Things that seem wrong, underdeveloped, or likely to cause problems.
-- Distinguish between "definitely wrong" and "possibly wrong." Mark each concern with severity.
-- For each concern, say what would resolve it.
+- Substantive issues, each marked severity (definitely-wrong vs possibly-wrong), each with what would resolve it.
 
 ## Suggestions
-
-- Changes the author might consider: additions, removals, reorganizations, alternative approaches.
-- Novel ideas that might improve the design, even if non-standard.
-- Prioritize suggestions — which ones matter most?
+- Additions, removals, reorganizations, alternatives; novel ideas welcome. Prioritize.
 
 ## Open questions
-
-- Questions the LLP doesn't answer but needs to.
-- Assumptions the LLP makes without justifying.
-- Decisions that are still implicit and should be made explicit.
+- What the document doesn't answer but needs to; assumptions left unjustified.
 
 ## Recommended next step
-
-- Does the LLP need revisions before moving forward? (Stay `Draft`)
-- Is it ready for a different model's review? (Move to `Review` if not already)
-- Is it ready for acceptance? (Move to `Accepted`)
-- Is it fundamentally misconceived? (Consider `Withdrawn` or major rewrite)
+- Revise (stay Draft) / more model reviews (Review) / ready to Accept / major rework.
 ```
 
-Lead with findings, not with process. A reader scanning the review should see the overall assessment, strengths, and concerns first.
+## What tooling can and cannot verify
 
-### 4. Save the review artifact
-
-Determine the save path:
-
-1. Strip the `NNNN-` prefix from the LLP filename. Example: `0042-token-rotation.rfc.md` → `token-rotation.rfc.md`.
-2. Strip the trailing `.md`. → `token-rotation.rfc`.
-3. The slug is now `token-rotation.rfc` (or just `token-rotation` if the project convention strips the type too — follow whatever convention exists in the existing `notes-archive/llp-reviews/` directory).
-4. Count existing files matching `notes-archive/llp-reviews/<slug>.round-*.claude.md`. The next round is one higher than the max found.
-5. Final path: `notes-archive/llp-reviews/<slug>.round-<N>.claude.md`.
-
-Create the directory if it doesn't exist.
-
-Write the review to that file.
-
-### 5. Present the review to the user
-
-Show the full review in the conversation. Also show the path where it was saved so the user can find it later.
-
-### 6. Suggest status transitions
-
-Based on the review's recommended next step:
-
-- If concerns are significant: "This LLP likely needs revisions. Consider addressing the concerns and requesting another review."
-- If the review is positive and the LLP is `Draft`: "Consider moving this to `Review` and requesting reviews from additional models before acceptance."
-- If the LLP is already in `Review` and this round looks good: "This LLP looks ready for acceptance. Remember that the project's RFC process may require reviews from multiple models — check LLP 0005 or the project's RFC process guide for the specific requirements."
-
-Always remind the user that if the project uses the multi-model review process (LLP 0005 or equivalent), a single AI review is not sufficient for acceptance — human judgment and additional model reviews are part of the process.
+The header is **auditable self-attestation, not proof**. Mechanically checkable (by `llp-maintain` or the `ref-check` gate): the artifact exists and is well-formed; the header fields are present; the non-author families are distinct and number ≥ 2; and, for `cli-runner`, that a referenced transcript/hash resolves. What is **not** mechanically checkable: whether a `manual` external review actually occurred. A malformed artifact can be rejected; a fabricated-but-well-formed one cannot — which is exactly why step 3 refuses to record a review it wasn't given.
 
 ## Scope limits
 
-- Do not change the LLP's `Status` field yourself. Suggest transitions; leave the change to the user.
-- Do not claim an LLP is accepted or that a review process is complete.
-- Do not overwrite existing review artifacts. Always increment the round number.
-- Do not invent content that isn't in the LLP. Quote or paraphrase to ground the review in the actual text.
-- Do not critique the LLP type or format choices unless the user asks — focus on the content.
+- Do not fabricate reviews or mark the loop complete by intent.
+- Do not change the LLP's `Status`, and do not accept or reject on the author's behalf.
+- Do not overwrite a review artifact from a different reviewer; one file per family (add a dated section for a re-review of the same family).
+- Do not invent content not in the LLP; quote or paraphrase to ground the review.
