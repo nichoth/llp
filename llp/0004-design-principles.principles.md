@@ -1,10 +1,11 @@
 # LLP 0004: Design Principles
 
 **Type:** Principles
-**Status:** Draft
+**Status:** Active
 **Systems:** LLP
 **Author:** Charlie Cheever / Claude
 **Date:** 2026-04-01
+**Revised:** 2026-06-10 (added "Contracts over recipes" and "The capability test", per LLP 0009)
 
 ## Summary
 
@@ -34,9 +35,17 @@ The decision heuristic for whether code needs a reference: **if an agent might "
 
 Code that is straightforward, obvious from context, or volatile enough that it will change soon does not need a reference.
 
+## Contracts over recipes
+
+Normative content states *what must be true* — document shapes, the reference grammar, lifecycle rules, behavioral protocols. How-to content — recipes, pipelines, scaffolds, worked prompts — is advisory, visibly marked (`> **Recipe (advisory)**`), homed in the corpus rather than in skills, and deletable. A skill or spec section must be classifiable at a glance as one or the other.
+
+## The capability test
+
+The companion to the simplify test, applied to LLP itself: **would this still earn its keep if the model were flawless?** If yes — it carries information the code doesn't, or coordinates humans and agents across time — it is core. If it exists to prevent model error, it is a recipe: keep it only while the error is real, and delete it when the failure it prevents stops being observed. (Defined in [LLP 0009](./0009-capability-invariant-core.rfc.md).)
+
 ## Composable pipelines over monolithic tools
 
-Tooling follows Ramsey's noweb principle: small, composable filters with clear inputs and outputs. Each pipeline stage (extract, resolve, index, annotate) is independent. New capabilities are new stages, not modifications to existing ones.
+Tooling follows Ramsey's noweb principle: small, composable filters with clear inputs and outputs. `ref-check` keeps its checks separable and its output greppable; new capabilities (an index, an annotated view) are new stages, not modifications to existing ones.
 
 ## Core stays small
 

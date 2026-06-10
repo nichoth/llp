@@ -1,10 +1,12 @@
 # LLP 0006: External and Non-Markdown References
 
 **Type:** RFC
-**Status:** Draft
+**Status:** Tombstoned
 **Systems:** LLP
 **Author:** Charlie Cheever / Claude
 **Date:** 2026-04-03
+**Revised:** 2026-06-10
+**Superseded by:** LLP 0000 §2 (normative content folded into the reference grammar per LLP 0009; kept for its alternatives-considered record)
 **Related:** LLP 0000
 
 ## Summary

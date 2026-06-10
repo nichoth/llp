@@ -1,10 +1,12 @@
 # LLP 0002: Retrofitting LLP into an Existing Codebase
 
 **Type:** Guide
-**Status:** Draft
+**Status:** Tombstoned
 **Systems:** LLP
 **Author:** Charlie Cheever / Claude
 **Date:** 2026-04-01
+**Revised:** 2026-06-10
+**Superseded by:** LLP 0001 (merged into the unified adoption guide, per LLP 0009)
 
 ## Summary
 
