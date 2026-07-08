@@ -5,36 +5,67 @@
 **Systems:** LLP
 **Author:** Charlie Cheever / Claude
 **Date:** 2026-04-01
-**Revised:** 2026-06-10 (merged with the former LLP 0002 retrofit guide, per [LLP 0009](./0009-capability-invariant-core.rfc.md))
+**Revised:** 2026-06-10 (merged with the former LLP 0002 retrofit guide, per
+[LLP 0009](./0009-capability-invariant-core.rfc.md))
 **Related:** LLP 0000
 
 ## Summary
 
-This guide covers bringing LLP to any repository. Greenfield and brownfield are not two processes — they are two ends of one spectrum: *how much design knowledge already exists to mine*. A fresh repo needs structure and habits (**scaffold**); an established codebase additionally needs comprehension, drafting, migration, and annotation (**retrofit**). The `llp-adopt` skill automates both modes; this guide is the underlying workflow.
+This guide covers bringing LLP to any repository. Greenfield and brownfield are
+not two processes — they are two ends of one spectrum:
+*how much design knowledge already exists to mine*. A fresh repo needs
+structure and habits (**scaffold**); an established codebase additionally needs
+comprehension, drafting, migration, and annotation (**retrofit**).
+The `llp-adopt` skill automates both modes; this guide is the
+underlying workflow.
 
 ## Choosing a mode
 
-Inspect the repository first. Is there already an `llp/` directory (extend it — don't start a second setup layer)? Are there agent-instruction files? How much code and documentation exists?
+Inspect the repository first. Is there already an `llp/` directory
+(extend it — don't start a second setup layer)? Are there agent-instruction
+files? How much code and documentation exists?
 
 - **Little or no code/docs to mine** → scaffold.
-- **Substantial existing code, docs, or history** → retrofit. Retrofit is scaffold plus comprehension; everything in the scaffold section applies to both.
+- **Substantial existing code, docs, or history** → retrofit. Retrofit is
+  scaffold plus comprehension; everything in the scaffold section
+  applies to both.
 
 ## Shared spine (both modes)
 
-1. **Create `llp/`.** Flat is fine to start; add subdirectories only when a domain has enough documents to warrant grouping.
-2. **Write LLP 0000, the root document** — typically an `Explainer` carrying `**Role:** Root`: what the project does and why, the major subsystems and how they relate, and key constraints or invariants that aren't obvious from the code. Even a half-page is valuable; it gives agents a starting point and humans a place to point newcomers.
-3. **Configure agent instructions.** Add or update `AGENTS.md` so agents know: where LLP documents live; to read relevant LLPs before changing areas they cover; to add `@ref` annotations when implementing non-obvious documented decisions; to update LLPs when the design changes; and to flag code that contradicts its referenced LLP. When a tool expects `CLAUDE.md`, symlink it to `AGENTS.md` rather than maintaining divergent copies. This is what makes LLP self-reinforcing: agents told about the system maintain it as they work.
-4. **Reruns are idempotent.** Setting up twice must not duplicate files or instruction blocks.
+1. **Create `llp/`.** Flat is fine to start; add subdirectories only when a
+   domain has enough documents to warrant grouping.
+2. **Write LLP 0000, the root document** — typically an `Explainer` carrying
+   `**Role:** Root`: what the project does and why, the major subsystems and
+   how they relate, and key constraints or invariants that aren't obvious
+   from the code. Even a half-page is valuable; it gives agents a starting point
+   and humans a place to point newcomers.
+3. **Configure agent instructions.** Add or update `AGENTS.md` so agents know:
+   where LLP documents live; to read relevant LLPs before changing areas they
+   cover; to add `@ref` annotations when implementing non-obvious documented
+   decisions; to update LLPs when the design changes; and to flag code that
+   contradicts its referenced LLP. When a tool expects `CLAUDE.md`, symlink
+   it to `AGENTS.md` rather than maintaining divergent copies. This is what
+   makes LLP self-reinforcing: agents told about the system maintain it as
+   they work.
+4. **Reruns are idempotent.** Setting up twice must not duplicate files or
+   instruction blocks.
 
 ## Scaffold mode (greenfield)
 
 ### Capture decisions as you make them
 
-As design decisions arise — a database choice, an API shape, a framework — capture the non-obvious ones in short LLPs while the reasoning is fresh. Early documents tend to be RFCs ("chose SQLite over Postgres because this is a single-node CLI tool"), Decisions, or Principles ("prefer explicit configuration over convention-based magic"). Don't write documents preemptively; speculation without code decays fast.
+As design decisions arise — a database choice, an API shape, a framework --
+capture the non-obvious ones in short LLPs while the reasoning is fresh.
+Early documents tend to be RFCs ("chose SQLite over Postgres because this
+is a single-node CLI tool"), Decisions, or Principles ("prefer explicit
+configuration over convention-based magic"). Don't write documents preemptively;
+speculation without code decays fast.
 
 ### Annotate as you write code
 
-The best time to add a `@ref` is immediately after writing the code it describes — the connection is fresh and accurate. A practical habit: when you finish implementing something covered by an LLP, add the reference before moving on.
+The best time to add a `@ref` is immediately after writing the code it describes
+-- the connection is fresh and accurate. A practical habit: when you finish
+implementing something covered by an LLP, add the reference before moving on.
 
 ### Don't over-invest upfront
 

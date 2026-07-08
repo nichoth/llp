@@ -1,5 +1,23 @@
 # Linked Literate Programming (LLP)
 
+<details><summary><h2>Contents</h2></summary>
+
+<!-- toc -->
+
+- [Reference syntax at a glance](#reference-syntax-at-a-glance)
+- [The problem](#the-problem)
+- [The core idea](#the-core-idea)
+- [Quick start](#quick-start)
+- [Skills](#skills)
+  * [Writing new skills](#writing-new-skills)
+- [What's in this repo](#whats-in-this-repo)
+- [The Loop](#the-loop)
+- [License](#license)
+
+<!-- tocstop -->
+
+</details>
+
 **Keep humans in markdown. Let AI write and review the code.**
 
 LLP is infrastructure for codebases where humans work at the level they're
@@ -64,7 +82,7 @@ it, because the documentation *is* what the agents work from.
 
 **1. Create an `llp/` directory and a root document:**
 
-```markdown
+```md
 # LLP 0000: My Project
 
 **Type:** Explainer
@@ -104,7 +122,7 @@ automates it.
 
 ## Skills
 
-Five skills cover the LLP loop — each a plain-markdown directory under
+Five skills cover the LLP loop -- each a plain-markdown directory under
 [`skills/`](./skills/) with a `SKILL.md` contract
 (trigger · invariants · artifact · hand-offs). Claude Code consumes them
 directly; other agent tools can adopt the same shape. Install by copying:
@@ -131,7 +149,10 @@ is this small.
 
 ### Writing new skills
 
-A skill is a directory with a `SKILL.md`: YAML frontmatter (`name`, `description`, optionally `source`) plus markdown instructions. Keep descriptions precise — they're the signal for invocation — and keep policy in LLP documents, with the skill citing it.
+A skill is a directory with a `SKILL.md`: YAML frontmatter
+(`name`, `description`, optionally `source`) plus markdown instructions.
+Keep descriptions precise — they're the signal for invocation -- and keep
+policy in LLP documents, with the skill citing it.
 
 ## What's in this repo
 
@@ -151,6 +172,20 @@ A skill is a directory with a `SKILL.md`: YAML frontmatter (`name`, `description
 All documents live under [`llp/`](./llp/) (`llp/tombstones/` holds the
 retired ones); skills under [`skills/`](./skills/); the checker is
 [`ref-check`](./ref-check) with its fixture under [`fixtures/`](./fixtures/).
+
+## The Loop
+
+“The LLP loop” is the recurring workflow that keeps code and design
+rationale connected.
+
+**the loop is basically**:
+
+1. `llp-orient`: read the governing LLP context before changing code
+2. `llp-create`: write or extend an LLP when a decision needs to be captured
+3. `llp-review`: run the formal review loop from
+4. `llp-maintain`: check drift, refs, and doc/code alignment as things evolve
+5. `llp-adopt`: bootstrap LLP in a repo that does not have it yet
+
 
 ## License
 
