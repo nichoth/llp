@@ -2,9 +2,14 @@
 
 **Keep humans in markdown. Let AI write and review the code.**
 
-LLP is infrastructure for codebases where humans work at the level they're good at — English prose, design decisions, principles, tradeoffs — and AI handles the code and most of the review. It's a structured way to give AI agents the context they need so that what they produce stays consistent with what the humans (and other AIs) behind the project actually want.
+LLP is infrastructure for codebases where humans work at the level they're
+good at — English prose, design decisions, principles, tradeoffs -- and AI
+handles the code and most of the review. It's a structured way to give AI
+agents the context they need so that what they produce stays consistent with
+what the humans (and other AIs) behind the project actually want.
 
-> **Rule of thumb:** if an AI agent might "simplify" this code in a way that would break the design intent, it needs a reference.
+> **Rule of thumb:** if an AI agent might "simplify" this code in a way that
+> would break the design intent, it needs a reference.
 
 ## Reference syntax at a glance
 
@@ -18,20 +23,42 @@ LLP is infrastructure for codebases where humans work at the level they're good 
 
 ## The problem
 
-Living codebases carry an enormous amount of implicit knowledge: the decisions, principles, and constraints behind why things are the way they are. Today that knowledge lives in Notion pages, Google Docs, Slack threads, and the heads of senior engineers. When an AI agent writes new code, it can't see any of it — and no model capability closes that gap, because the *why* behind code is information the code doesn't contain. A smarter model doesn't recover unrecorded rationale; it produces a more convincing guess.
+Living codebases carry an enormous amount of implicit knowledge: the decisions,
+principles, and constraints behind why things are the way they are. Today that
+knowledge lives in Notion pages, Google Docs, Slack threads, and the heads of
+senior engineers. When an AI agent writes new code, it can't see any of it --
+and no model capability closes that gap, because the *why* behind code is
+information the code doesn't contain. A smarter model doesn't recover unrecorded
+rationale; it produces a more convincing guess.
 
-Some AI harnesses address this with "memory" — ambient notes the agent accumulates. That helps, but it's unstructured and hard to curate: when you change your mind, remnants of the old decision linger and keep influencing new code. LLP is the structured, explicit version of that idea. Decisions live in markdown documents in the repo, versioned like code. When a decision changes, you update the document, and the next thing the AI writes reflects the new intent — not an echo of the old one.
+Some AI harnesses address this with "memory" — ambient notes the agent
+accumulates. That helps, but it's unstructured and hard to curate: when you
+change your mind, remnants of the old decision linger and keep influencing
+new code. LLP is the structured, explicit version of that idea. Decisions live
+in markdown documents in the repo, versioned like code. When a decision changes,
+you update the document, and the next thing the AI writes reflects the new
+intent -- not an echo of the old one.
 
 ## The core idea
 
-Humans stay in markdown. That's where they read fastest, argue most clearly, and make the decisions that matter. The code itself, and most of the review, can be left to AI — but the AI needs to know *why* the code exists in the form it does. LLP gives it that, via thin pointers from code to the exact section of the exact document that explains a given decision:
+Humans stay in markdown. That's where they read fastest, argue most clearly,
+and make the decisions that matter. The code itself, and most of the review,
+can be left to AI — but the AI needs to know *why* the code exists in the form
+it does. LLP gives it that, via thin pointers from code to the exact section of
+the exact document that explains a given decision:
 
 ```rust
-// @ref LLP 0042#token-strategy — Session tokens must be rotated on privilege escalation
+// @ref LLP 0042#token-strategy -- Session tokens must be rotated on
+// privilege escalation
 pub fn escalate_privilege(session: &Session) -> Result<Session> {
 ```
 
-The `@ref` comment is a machine-readable link. An agent reviewing this function follows it to the rationale and checks whether a proposed change still satisfies the constraint. Review shifts from "what is this doing?" to "does this still match the referenced decision?" — and the documentation can't drift into stale-wiki territory without the code starting to drift with it, because the documentation *is* what the agents work from.
+The `@ref` comment is a machine-readable link. An agent reviewing this function
+follows it to the rationale and checks whether a proposed change still
+satisfies the constraint. Review shifts from "what is this doing?" to
+"does this still match the referenced decision?" -- and the documentation
+can't drift into stale-wiki territory without the code starting to drift with
+it, because the documentation *is* what the agents work from.
 
 ## Quick start
 
@@ -61,15 +88,19 @@ Major subsystems and how they relate.
 export function handleWidgetRequest(req: Request): Response {
 ```
 
-**3. Validate references and metadata** with [`ref-check`](./ref-check) — a dependency-free checker suitable for CI (this repo runs it on every push):
+**3. Validate references and metadata** with [`ref-check`](./ref-check) -- a
+dependency-free checker suitable for CI (this repo runs it on every push):
 
 ```bash
 ./ref-check
 ```
 
-For drift that takes judgment — code that no longer matches its referenced section, docs gone stale — use the `llp-maintain` skill interactively.
+For drift that takes judgment — code that no longer matches its referenced
+section, docs gone stale — use the `llp-maintain` skill interactively.
 
-The full workflow (greenfield and retrofit) is in [LLP 0001](./llp/0001-adopting-llp.guide.md), and the `llp-adopt` skill automates it.
+The full workflow (greenfield and retrofit) is in
+[LLP 0001](./llp/0001-adopting-llp.guide.md), and the `llp-adopt` skill
+automates it.
 
 ## Skills
 
@@ -90,7 +121,13 @@ cp -r skills/llp-orient ~/.claude/skills/      # or all of skills/
 | [`llp-adopt`](./skills/llp-adopt/SKILL.md) | `/llp-adopt` | Bring LLP to any repo — `scaffold` (fresh) or `retrofit` (survey, draft provenance-tagged docs, propose a plan), auto-detected. |
 | [`llp-maintain`](./skills/llp-maintain/SKILL.md) | `/llp-maintain --intent <mode>` | Keep code and docs co-evolving: drift, ref repairs, provenance, retirements. Modes: `pre-pr`, `audit`, `reconcile`, `retire-proposal`. Proposes; never applies. |
 
-The skills are deletable adapters: every MUST in a `SKILL.md` cites the LLP section it comes from (as a pinned upstream URL, so copies stay resolvable), and a runtime with no skills mechanism gets the same behavior from the `AGENTS.md` routing block plus the documents. See [LLP 0008](./llp/0008-distributed-agent-skills.rfc.md) for the design and [LLP 0009](./llp/0009-capability-invariant-core.rfc.md) for why the set is this small.
+The skills are deletable adapters: every MUST in a `SKILL.md` cites the LLP
+section it comes from (as a pinned upstream URL, so copies stay resolvable),
+and a runtime with no skills mechanism gets the same behavior from the
+`AGENTS.md` routing block plus the documents. See
+[LLP 0008](./llp/0008-distributed-agent-skills.rfc.md) for the design and
+[LLP 0009](./llp/0009-capability-invariant-core.rfc.md) for why the set
+is this small.
 
 ### Writing new skills
 
@@ -98,14 +135,22 @@ A skill is a directory with a `SKILL.md`: YAML frontmatter (`name`, `description
 
 ## What's in this repo
 
-- **New to LLP?** [LLP 0000](./llp/0000-linked-literate-programming.explainer.md) — the root spec: documents, `@ref` grammar, lifecycle, conventions.
-- **Adopting LLP in a project?** [LLP 0001](./llp/0001-adopting-llp.guide.md) — greenfield and retrofit, one guide.
-- **The thinking behind it:** [LLP 0003](./llp/0003-prior-art.research.md) (prior art) and [LLP 0004](./llp/0004-design-principles.principles.md) (design principles).
-- **Authoring and review process:** [LLP 0005](./llp/0005-rfc-process.guide.md) — stakes-scaled review with fixed honesty rules.
+- **New to LLP?** [LLP 0000](./llp/0000-linked-literate-programming.explainer.md)
+  -- the root spec: documents, `@ref` grammar, lifecycle, conventions.
+- **Adopting LLP in a project?** [LLP 0001](./llp/0001-adopting-llp.guide.md) --
+  greenfield and retrofit, one guide.
+- **The thinking behind it:** [LLP 0003](./llp/0003-prior-art.research.md)
+  (prior art) and [LLP 0004](./llp/0004-design-principles.principles.md)
+  (design principles).
+- **Authoring and review process:** [LLP 0005](./llp/0005-rfc-process.guide.md)
+  -- stakes-scaled review with fixed honesty rules.
 - **The skills design:** [LLP 0008](./llp/0008-distributed-agent-skills.rfc.md).
-- **Why it's this simple:** [LLP 0009](./llp/0009-capability-invariant-core.rfc.md) — the capability-invariant core, and what was cut to get here.
+- **Why it's this simple:** [LLP 0009](./llp/0009-capability-invariant-core.rfc.md)
+  -- the capability-invariant core, and what was cut to get here.
 
-All documents live under [`llp/`](./llp/) (`llp/tombstones/` holds the retired ones); skills under [`skills/`](./skills/); the checker is [`ref-check`](./ref-check) with its fixture under [`fixtures/`](./fixtures/).
+All documents live under [`llp/`](./llp/) (`llp/tombstones/` holds the
+retired ones); skills under [`skills/`](./skills/); the checker is
+[`ref-check`](./ref-check) with its fixture under [`fixtures/`](./fixtures/).
 
 ## License
 
