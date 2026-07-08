@@ -73,7 +73,10 @@ The full workflow (greenfield and retrofit) is in [LLP 0001](./llp/0001-adopting
 
 ## Skills
 
-Five skills cover the LLP loop — each a plain-markdown directory under [`skills/`](./skills/) with a `SKILL.md` contract (trigger · invariants · artifact · hand-offs). Claude Code consumes them directly; other agent tools can adopt the same shape. Install by copying:
+Five skills cover the LLP loop — each a plain-markdown directory under
+[`skills/`](./skills/) with a `SKILL.md` contract
+(trigger · invariants · artifact · hand-offs). Claude Code consumes them
+directly; other agent tools can adopt the same shape. Install by copying:
 
 ```bash
 cp -r skills/llp-orient ~/.claude/skills/      # or all of skills/
