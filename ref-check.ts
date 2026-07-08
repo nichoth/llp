@@ -1,13 +1,13 @@
 #!/usr/bin/env -S node --experimental-strip-types
 // @ref LLP 0000#6-validation-ref-check — implements the checker specified there
 /**
- * ref-check — deterministic validator for LLP corpora and @ref annotations.
+ * ref-check — deterministic validator for LLP corpora and `@ref` annotations.
  *
  * Usage:
  *   ref-check [--root DIR] [--verbose]
  *
  * Checks (broken = exit 1):
- *   * @ref targets resolve: LLP numbers, anchors, repo paths. URLs are
+ *   * `@ref` targets resolve: LLP numbers, anchors, repo paths. URLs are
  *     shape-validated only (never fetched); shorthands are listed as
  *     unchecked unless the project defines a mapping.
  *   * LLP metadata headers parse; filename type matches **Type:**;
@@ -308,8 +308,7 @@ function check(root: string): { rep: Report; nFiles: number; nRefs: number; nDoc
         if (
             rel.startsWith(exemptA) ||
             rel.startsWith(exemptB) ||
-            path.basename(rel) === 'ref-check' ||
-            path.basename(rel) === 'ref-check.ts'
+            path.basename(rel) === 'ref-check'
         ) {
             continue
         }
@@ -360,7 +359,7 @@ function check(root: string): { rep: Report; nFiles: number; nRefs: number; nDoc
 }
 
 function printHelp(): void {
-    console.log(`ref-check — deterministic validator for LLP corpora and @ref annotations.
+    console.log(`ref-check — deterministic validator for LLP corpora and \`@ref\` annotations.
 
 Usage:
   ref-check [--root DIR] [--verbose]
@@ -406,7 +405,6 @@ function main(): void {
         console.error(`ERROR ${(err as Error).message}`)
         printHelp()
         process.exit(2)
-        return
     }
 
     const absRoot = path.resolve(args.root)

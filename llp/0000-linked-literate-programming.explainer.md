@@ -222,7 +222,7 @@ No relation means a general association — the default and most common case. Ad
 
 ### 6. Validation: ref-check
 
-`ref-check` is a dependency-free checker (in this repo's root; implemented in TypeScript and run with Node's `--experimental-strip-types`) for the places where no agent is in the loop: CI and pre-commit. Run it from a project root:
+`ref-check` is a dependency-free checker (in this repo's root) for the places where no agent is in the loop: CI and pre-commit. In this repository, it is implemented in TypeScript and run with Node's `--experimental-strip-types`. Run it from a project root:
 
 ```bash
 ./ref-check            # check this repo
