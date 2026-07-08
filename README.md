@@ -61,7 +61,7 @@ Major subsystems and how they relate.
 export function handleWidgetRequest(req: Request): Response {
 ```
 
-**3. Validate references and metadata** with [`ref-check`](./ref-check) — a single-file, dependency-free checker suitable for CI (this repo runs it on every push):
+**3. Validate references and metadata** with [`ref-check`](./ref-check) — a dependency-free checker suitable for CI (this repo runs it on every push):
 
 ```bash
 ./ref-check
