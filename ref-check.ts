@@ -27,14 +27,8 @@ import * as process from 'node:process'
 
 const SKIP_DIRS = new Set([
     '.git',
-    '.hg',
     'node_modules',
-    '__pycache__',
-    '.venv',
-    'venv',
     'dist',
-    'build',
-    '.next',
     '.idea',
     '.vscode'
 ])
@@ -58,29 +52,29 @@ const INFERRED = '[' + 'inferred]'
 type RefKind = 'llp' | 'url' | 'shorthand' | 'path'
 
 interface ParseTargetResult {
-    kind: RefKind
-    target: string
-    anchor: string | null
+    kind:RefKind
+    target:string
+    anchor:string|null
 }
 
 class Report {
-    errors: string[] = []
-    infos: string[] = []
+    errors:string[] = []
+    infos:string[] = []
 
-    error(msg: string): void {
+    error (msg:string):void {
         this.errors.push(msg)
     }
 
-    info(msg: string): void {
+    info (msg:string):void {
         this.infos.push(msg)
     }
 }
 
-function escapeRegExp(s: string): string {
+function escapeRegExp(s:string):string {
     return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-function slugify(text: string): string {
+function slugify(text:string):string {
     // GitHub-style heading slug: lowercase; spaces -> hyphens; keep
     // alphanumerics, hyphens, underscores; drop everything else.
     text = text.replace(/`/g, '')
@@ -95,7 +89,7 @@ function slugify(text: string): string {
     return out.join('')
 }
 
-function readText(filePath: string): string | null {
+function readText(filePath:string):string|null {
     try {
         const st = fs.statSync(filePath)
         if (st.size > MAX_BYTES) return null
@@ -105,7 +99,7 @@ function readText(filePath: string): string | null {
     }
 }
 
-function mdHeadings(text: string): string[] {
+function mdHeadings(text:string):string[] {
     // Heading texts outside fenced code blocks.
     const headings: string[] = []
     let fenced = false
@@ -121,7 +115,7 @@ function mdHeadings(text: string): string[] {
     return headings
 }
 
-function anchorResolves(anchor: string, headings: string[]): boolean {
+function anchorResolves(anchor:string, headings:string[]):boolean {
     const raw = anchor.replace(/^#/, '')
     const slugs = new Set(headings.map((h) => slugify(h)))
 
@@ -129,12 +123,14 @@ function anchorResolves(anchor: string, headings: string[]): boolean {
 
     if (/^\d+(\.\d+)*$/.test(raw)) {
         // numbered-section form: #3, #3.2
-        return headings.some((h) => new RegExp(`^${escapeRegExp(raw)}([.)\\s]|$)`).test(h))
+        return headings.some((h) => {
+            return new RegExp(`^${escapeRegExp(raw)}([.)\\s]|$)`).test(h)
+        })
     }
     return false
 }
 
-function parseTarget(restRaw: string): ParseTargetResult {
+function parseTarget(restRaw:string):ParseTargetResult {
     // Split an annotation body into (kind, target, anchor).
     let rest = restRaw.trim()
     rest = rest.split(/\s+[—–]|\s+--\s/)[0]?.trim() ?? '' // drop gloss
@@ -165,7 +161,10 @@ function parseTarget(restRaw: string): ParseTargetResult {
     return { kind: 'path', target: token, anchor: null }
 }
 
-function collectRefs(relPath: string, text: string): Array<{ lineno: number; rest: string }> {
+function collectRefs(relPath:string, text:string):Array<{
+    lineno:number;
+    rest:string;
+}> {
     const refs: Array<{ lineno: number; rest: string }> = []
 
     if (relPath.endsWith('.md')) {
@@ -187,11 +186,11 @@ function collectRefs(relPath: string, text: string): Array<{ lineno: number; res
     return refs
 }
 
-function walkFiles(root: string, skipReviewsAtRoot = false): string[] {
-    const out: string[] = []
+function walkFiles(root:string, skipReviewsAtRoot = false):string[] {
+    const out:string[] = []
 
-    function walk(dir: string): void {
-        let entries: fs.Dirent[]
+    function walk(dir:string):void {
+        let entries:fs.Dirent[]
         try {
             entries = fs.readdirSync(dir, { withFileTypes: true })
         } catch {
@@ -199,7 +198,10 @@ function walkFiles(root: string, skipReviewsAtRoot = false): string[] {
         }
 
         // Nested llp/ marks a separate corpus root; skip traversing into it.
-        if (dir !== root && entries.some((e) => e.isDirectory() && e.name === 'llp')) {
+        if (
+            dir !== root &&
+            entries.some((e) => (e.isDirectory() && e.name === 'llp'))
+        ) {
             return
         }
 
@@ -209,7 +211,12 @@ function walkFiles(root: string, skipReviewsAtRoot = false): string[] {
             if (SKIP_DIRS.has(ent.name)) continue
             const full = path.join(dir, ent.name)
             if (ent.isDirectory()) {
-                if (skipReviewsAtRoot && ent.name === 'reviews' && dir === root) continue
+                const isRootReview = (skipReviewsAtRoot &&
+                    ent.name === 'reviews' &&
+                    dir === root)
+
+                if (isRootReview) continue
+
                 walk(full)
             } else if (ent.isFile()) {
                 out.push(full)
@@ -221,7 +228,7 @@ function walkFiles(root: string, skipReviewsAtRoot = false): string[] {
     return out
 }
 
-function countOccurrences(haystack: string, needle: string): number {
+function countOccurrences(haystack:string, needle:string):number {
     if (!needle) return 0
     let idx = 0
     let count = 0
@@ -234,7 +241,12 @@ function countOccurrences(haystack: string, needle: string): number {
     return count
 }
 
-function check(root: string): { rep: Report; nFiles: number; nRefs: number; nDocs: number } {
+function check(root:string):{
+    rep:Report;
+    nFiles:number;
+    nRefs:number;
+    nDocs:number
+} {
     const rep = new Report()
     const llpDir = path.join(root, 'llp')
 
