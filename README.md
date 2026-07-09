@@ -175,6 +175,7 @@ retired ones); skills under [`skills/`](./skills/); the checker is
 
 ## The Loop
 
+0. **Adopt** -- see [0001](./llp/0001-adopting-llp.guide.md). Use `/llp-adopt`.
 1. **Draft stage**: You write or iterate on an LLP document
    (e.g., an RFC, Spec, or Plan)
 2. **Review stage**: Set Status: Review in the document's metadata
@@ -206,8 +207,8 @@ happens must leave evidence.
 
 ### Implement
 
-At some point you change the "status" in the LLP doc to `Accepted`, then you
-just ask an agent to implement it, for example,
+At some point you change the "status" in the LLP doc to `Accepted`. Then you
+ask an agent to implement it, for example,
 
 ```md
 Implement the widget API described in LLP 0042. Start by running
