@@ -175,17 +175,46 @@ retired ones); skills under [`skills/`](./skills/); the checker is
 
 ## The Loop
 
-“The LLP loop” is the recurring workflow that keeps code and design
-rationale connected.
+1. **Draft stage**: You write or iterate on an LLP document
+   (e.g., an RFC, Spec, or Plan)
+2. **Review stage**: Set Status: Review in the document's metadata
+3. **Multi-model review** (for high stakes):
+   - Get critical feedback from at least two different model families
+     (e.g., Claude + GPT)
+   - Use the standard review prompt: "What do you think of this proposal?
+     Is it a good idea? How would you change it?"
+   - Save each review as a separate artifact:
+     `llp/reviews/NNNN-slug.claude.md`, `llp/reviews/NNNN-slug.gpt.md`, etc.
+4. **Address feedback**: The author (you) decides which feedback is compelling
+   and updates the document accordingly
+5. **Accept**: When satisfied, change Status: `Review` -> Status: `Accepted`
+6. **Implement**: Implement the design and mark it as Status: Active
 
-**the loop is basically**:
+### Making it actually happen
 
-1. `llp-orient`: read the governing LLP context before changing code
-2. `llp-create`: write or extend an LLP when a decision needs to be captured
-3. `llp-review`: run the formal review loop from
-4. `llp-maintain`: check drift, refs, and doc/code alignment as things evolve
-5. `llp-adopt`: bootstrap LLP in a repo that does not have it yet
+1. **Create review artifacts**: Manually send your LLP document to different AI
+   models (Claude, GPT, etc.) with the standard review prompt
+2. **Document the reviews**: Save each response in llp/reviews/ with the
+   provenance header (reviewer family, date, method, redacted status)
+3. **Iterate on the document**: Update your LLP based on compelling feedback
+4. **Run ./ref-check**: Validate your references and metadata before committing
 
+The "loop" isn't automatic. It's an explicit, auditable process where you
+orchestrate review from multiple reviewers, save artifacts, and iterate.
+The honesty rule is paramount: never fabricate a review, and every review that
+happens must leave evidence.
+
+### Implement
+
+At some point you change the "status" in the LLP doc to `Accepted`, then you
+just ask an agent to implement it, for example,
+
+```md
+Implement the widget API described in LLP 0042. Start by running
+`/llp-orient llp/0042-widget-api.rfc.md` to load the constraints, then build
+it with @ref annotations pointing back to the LLP sections that justify key
+design decisions.
+```
 
 ## License
 
